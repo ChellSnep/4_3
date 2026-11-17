@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Jokebook</title>
+  </head>
+  <body>
+    <button id="btnCategories">Pobierz kategorie</button>
+    <button id="btnRandom">Losowy żart</button>
+    <p id="output"></p>
+
+    <script>
+      const API = "http://localhost:3000";
+      const output = document.getElementById("output");
+
+      document.getElementById("btnCategories").onclick = async () => {
+        const res = await fetch(`${API}/jokebook/categories`);
+        const categories = await res.json();
+        output.textContent = categories.join(", ");
+      };
+
+      document.getElementById("btnRandom").onclick = async () => {
+        const res = await fetch(`${API}/jokebook/random`);
+        const data = await res.json();
+        output.textContent = `${data.joke} ${data.response}`;
+      };
+    </script>
+  </body>
+</html>

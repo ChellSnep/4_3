@@ -1,19 +1,99 @@
-'use strict';
+"use strict";
 
-const express = require('express');
+const express = require("express");
+const { setEngine } = require("node:crypto");
 const app = express();
 
-// define endpoint for exercise 1 here
-app.get('/math/circle/:r', (req, res) => {
-//TODO1  
-  res.json(result);
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+  next();
 });
 
-//TODO2
+const cors = require("cors");
+app.use(cors());
 
+app.use(express.json());
 
-//TODO3
+let categories = ["funnyJoke", "lameJoke"];
 
+let funnyJoke = [
+  {
+    joke: "Dlaczego komputer poszedł do lekarza?",
+    response: "Bo złapał wirusa!",
+  },
+  {
+    joke: "Dlaczego komputer nie może być głodny?",
+    response: "Bo ma pełen dysk!",
+  },
+  {
+    joke: "Co mówi jeden bit do drugiego?",
+    response: "„Trzymaj się, zaraz się przestawiamy!”",
+  },
+];
+
+let lameJoke = [
+  {
+    joke: "Dlaczego programiści preferują noc?",
+    response: "Bo w nocy jest mniej bugów do łapania!",
+  },
+  {
+    joke: "Jak nazywa się bardzo szybki programista?",
+    response: "Błyskawiczny kompilator!",
+  },
+];
+
+const jokebook = { funnyJoke, lameJoke };
+
+app.get("/jokebook/categories", (req, res) => {
+  res.json(categories);
+});
+
+app.get("/jokebook/joke/:category", (req, res) => {
+  const category = req.params.category;
+
+  if (!categories.includes(category)) {
+    return res.json({ error: `no jokes for category ${category}` });
+  }
+
+  const list = jokebook[category];
+  const randomJoke = list[Math.floor(Math.random() * list.length)];
+  res.json(randomJoke);
+});
+
+app.get("/jokebook/random", (req, res) => {
+  const category = categories[Math.floor(Math.random() * categories.length)];
+  const list = jokebook[category];
+  const randomJoke = list[Math.floor(Math.random() * list.length)];
+  res.json({ category, ...randomJoke });
+});
+
+// TODO 2
+app.post("/jokebook/joke/:category", (req, res) => {
+  const category = req.params.category;
+
+  if (!categories.includes(category)) {
+    return res.json({ error: `no jokes for category ${category}` });
+  }
+
+  const { joke, response } = req.body || {};
+
+  if (!joke || !response) {
+    return res.status(400).json({ error: "Invalid input" });
+  }
+
+  jokebook[category].push({ joke, response });
+
+  res.status(201).json({
+    message: `Joke added to category ${category}`,
+    joke: { joke, response },
+  });
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
