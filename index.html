@@ -7,6 +7,17 @@
   <body>
     <button id="btnCategories">Pobierz kategorie</button>
     <button id="btnRandom">Losowy żart</button>
+
+    <h3>Dodaj żart</h3>
+    <select id="category">
+      <option value="funnyJoke">funnyJoke</option>
+      <option value="lameJoke">lameJoke</option>
+    </select>
+    <input id="joke" />
+    <input id="response" />
+    <button id="btnAdd">Dodaj żart</button>
+    <p id="addMessage"></p>
+
     <p id="output"></p>
 
     <script>
@@ -23,6 +34,27 @@
         const res = await fetch(`${API}/jokebook/random`);
         const data = await res.json();
         output.textContent = `${data.joke} ${data.response}`;
+      };
+
+      document.getElementById("btnAdd").onclick = async () => {
+        const category = document.getElementById("category").value;
+        const joke = document.getElementById("joke").value;
+        const response = document.getElementById("response").value;
+        const message = document.getElementById("addMessage");
+
+        try {
+          const res = await fetch(`${API}/jokebook/joke/${category}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ joke, response }),
+          });
+          const data = await res.json();
+          message.textContent = data.error
+            ? `Błąd: ${data.error}`
+            : data.message;
+        } catch (err) {
+          message.textContent = "Błąd: brak połączenia z serwerem";
+        }
       };
     </script>
   </body>
