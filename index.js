@@ -95,6 +95,16 @@ app.post("/jokebook/joke/:category", (req, res) => {
   });
 });
 
+app.get("/jokebook/stats", (req, res) => {
+  const stats = {};
+
+  categories.forEach((category) => {
+    stats[category] = jokebook[category].length;
+  });
+
+  res.json(stats);
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);

@@ -18,6 +18,10 @@
     <button id="btnAdd">Dodaj żart</button>
     <p id="addMessage"></p>
 
+    <h3>Statystyki</h3>
+    <button id="btnStats">Pokaż statystyki</button>
+    <table id="statsTable" border="1"></table>
+
     <p id="output"></p>
 
     <script>
@@ -54,6 +58,19 @@
             : data.message;
         } catch (err) {
           message.textContent = "Błąd: brak połączenia z serwerem";
+        }
+      };
+
+      document.getElementById("btnStats").onclick = async () => {
+        const res = await fetch(`${API}/jokebook/stats`);
+        const stats = await res.json();
+        const table = document.getElementById("statsTable");
+
+        table.innerHTML = "<tr><th>Kategoria</th><th>Liczba żartów</th></tr>";
+        for (const [category, count] of Object.entries(stats)) {
+          const row = table.insertRow();
+          row.insertCell().textContent = category;
+          row.insertCell().textContent = count;
         }
       };
     </script>
