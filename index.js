@@ -105,6 +105,28 @@ app.get("/jokebook/stats", (req, res) => {
   res.json(stats);
 });
 
+app.get("/jokebook/search", (req, res) => {
+  const word = req.query.word;
+
+  if (typeof word !== "string" || word.trim() === "") {
+    return res.status(400).json({ error: "Invalid input" });
+  }
+
+  const keyword = word.trim().toLowerCase();
+  const results = [];
+
+  categories.forEach((category) => {
+    jokebook[category].forEach((item) => {
+      const text = `${item.joke} ${item.response}`.toLowerCase();
+      if (text.includes(keyword)) {
+        results.push({ category, joke: item.joke, response: item.response });
+      }
+    });
+  });
+
+  res.json(results);
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);

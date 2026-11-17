@@ -22,6 +22,11 @@
     <button id="btnStats">Pokaż statystyki</button>
     <table id="statsTable" border="1"></table>
 
+    <h3>Wyszukiwanie</h3>
+    <input id="word" />
+    <button id="btnSearch">Szukaj</button>
+    <div id="searchResults"></div>
+
     <p id="output"></p>
 
     <script>
@@ -72,6 +77,28 @@
           row.insertCell().textContent = category;
           row.insertCell().textContent = count;
         }
+      };
+
+      document.getElementById("btnSearch").onclick = async () => {
+        const word = document.getElementById("word").value;
+        const box = document.getElementById("searchResults");
+        box.innerHTML = "";
+
+        const res = await fetch(
+          `${API}/jokebook/search?word=${encodeURIComponent(word)}`,
+        );
+        const results = await res.json();
+
+        if (!Array.isArray(results) || results.length === 0) {
+          box.textContent = "Brak żartów pasujących do wyszukiwania";
+          return;
+        }
+
+        results.forEach((item) => {
+          const p = document.createElement("p");
+          p.textContent = `[${item.category}] ${item.joke} — ${item.response}`;
+          box.appendChild(p);
+        });
       };
     </script>
   </body>
